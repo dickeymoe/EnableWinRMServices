@@ -55,6 +55,7 @@ goto main
 
 :EnableWinRM_byTarget
 	echo EnableWinRM_byTarget
+	
 	::Starts the WinRM service on machine
 	psservice.exe \\%TARGET% start winrm
 	echo WinRM service started on %TARGET%
@@ -66,6 +67,7 @@ goto main
 	
 :DisableWinRM_byTarget
 	echo DisableWinRM_byTarget
+	
 	::Sets WinRM back to manual
 	psservice.exe \\%TARGET% setconfig winrm demand
 	echo WinRM service set to Manual on %TARGET%
@@ -76,6 +78,7 @@ goto main
 	goto EOF
 	
 :UseWithList
+	
 	:: check that the listfile is there
 	if not exist %LISTFILE% (
 	   echo Listfile %LISTFILE% not found. Create it and try again.
@@ -90,8 +93,10 @@ goto main
 	echo -------------------------------------------------------
 	echo Starting WinRM Service and set to Automatic
 	echo -------------------------------------------------------
+	
 	:: Loop through the server list
 	for /F  %%A in (%LISTFILE%) do (
+		
 		::Starts the WinRM service on machine
 		psservice.exe \\%%A start winrm
 		echo WinRM service started on %%A
