@@ -36,22 +36,22 @@ if [%1] == [] goto help
 goto main
 
 :main
-set RUNTYPE=""
-set LISTFILE=""
-set TARGET=""
-set RUNTYPE=%1
-if "%1"=="-UseList" set LISTFILE=%3
-if "%1"=="-NoList"	set TARGET=%3
-if [%1] == [] goto help
-if [%2] == [] echo Please specify -on or -off
-echo. 
-if [%2] == [] goto help
-if "%1"=="-NoList" goto NoList
-if "%1"=="-UseList" goto UseWithList
+	set RUNTYPE=""
+	set LISTFILE=""
+	set TARGET=""
+	set RUNTYPE=%1
+	if "%1"=="-UseList" set LISTFILE=%3
+	if "%1"=="-NoList"	set TARGET=%3
+	if [%1] == [] goto help
+	if [%2] == [] echo Please specify -on or -off
+	echo. 
+	if [%2] == [] goto help
+	if "%1"=="-NoList" goto NoList
+	if "%1"=="-UseList" goto UseWithList
 
 :NoList
-if "%2" == "-on" goto EnableWinRM_byTarget
-if "%2" == "-off" goto DisableWinRM_byTarget
+	if "%2" == "-on" goto EnableWinRM_byTarget
+	if "%2" == "-off" goto DisableWinRM_byTarget
 
 :EnableWinRM_byTarget
 	echo EnableWinRM_byTarget
@@ -76,88 +76,90 @@ if "%2" == "-off" goto DisableWinRM_byTarget
 	goto EOF
 	
 :UseWithList
-:: check that the listfile is there
-if not exist %LISTFILE% (
-   echo Listfile %LISTFILE% not found. Create it and try again.
-   exit /b 1
-   goto EOF
-)
+	:: check that the listfile is there
+	if not exist %LISTFILE% (
+	   echo Listfile %LISTFILE% not found. Create it and try again.
+	   exit /b 1
+	   goto EOF
+	)
 
-if "%2" == "-on" goto EnableWinRM_byList
-if "%2" == "-off" goto DisableWinRM_byList
+	if "%2" == "-on" goto EnableWinRM_byList
+	if "%2" == "-off" goto DisableWinRM_byList
 
 :EnableWinRM_byList
-echo -------------------------------------------------------
-echo Starting WinRM Service and set to Automatic
-echo -------------------------------------------------------
-:: Loop through the server list
-for /F  %%A in (%LISTFILE%) do (
-	::Starts the WinRM service on machine
-	psservice.exe \\%%A start winrm
-	echo WinRM service started on %%A
-	
-	::Sets the (running) WinRM service to auto
-	psservice \\%%A setconfig winrm auto
-	echo WinRM service set to Automatic on %%A
-)
-echo -------------------------------------------------------
-echo Started WinRM Service (Automatic) for all items in list
-echo -------------------------------------------------------
-goto EOF
+	echo -------------------------------------------------------
+	echo Starting WinRM Service and set to Automatic
+	echo -------------------------------------------------------
+	:: Loop through the server list
+	for /F  %%A in (%LISTFILE%) do (
+		::Starts the WinRM service on machine
+		psservice.exe \\%%A start winrm
+		echo WinRM service started on %%A
+
+		::Sets the (running) WinRM service to auto
+		psservice \\%%A setconfig winrm auto
+		echo WinRM service set to Automatic on %%A
+	)
+	echo -------------------------------------------------------
+	echo Started WinRM Service (Automatic) for all items in list
+	echo -------------------------------------------------------
+	goto EOF
 
 :DisableWinRM_byList
-echo -------------------------------------------------------
-echo Stopping WinRM Service and set to Manual
-echo -------------------------------------------------------
-:: Loop through the server list
-for /F  %%A in (%LISTFILE%) do (
-	::Sets WinRM back to manual
-	psservice \\%%A setconfig winrm demand
-	echo WinRM service set to Manual on %%A
+	echo -------------------------------------------------------
+	echo Stopping WinRM Service and set to Manual
+	echo -------------------------------------------------------
 	
-	::Stops WinRM service
-	psservice \\%%A stop winrm
-	echo WinRM service stopped on %%A
-)
-echo -------------------------------------------------------
-echo Stopped WinRM Service (Manual) for all items in list
-echo -------------------------------------------------------
-goto EOF
+	:: Loop through the server list
+	for /F  %%A in (%LISTFILE%) do (
+		
+		::Sets WinRM back to manual
+		psservice \\%%A setconfig winrm demand
+		echo WinRM service set to Manual on %%A
+
+		::Stops WinRM service
+		psservice \\%%A stop winrm
+		echo WinRM service stopped on %%A
+	)
+	echo -------------------------------------------------------
+	echo Stopped WinRM Service (Manual) for all items in list
+	echo -------------------------------------------------------
+	goto EOF
 
 :help
-echo.
-echo ####HELP###########################################################
-echo.
-echo Program  : remotesvc_winrm.cmd
-echo Needed   : Ensure PSService.exe is in $Path
-echo            Ensure a listfile for machines exists
-echo            Ensure all servers are reachable
-echo Limits   : no check added so far covering the case where a
-echo            server cannot be contacted
-echo.
-echo -----------------With List-----------------------------------------
-echo Function : read the computerlist argument (example: C:\serverlist.txt)
-echo            in a for loop process each server name (1 per line)
-echo            and run the defined command on each server remotely
-echo Usage
-echo          : remotesvc_winrm.cmd [-UseList] [-on/-off] [serverlist.txt]
-echo.
-echo -----------------With Machine Name----------------------------------
-echo Function : read the computername argument (example: MACHINE_NAME)
-echo            and set WinRM service on and Automatic
-echo            or set the WinRM service to off and Manual
-echo Usage    : remotesvc_winrm.cmd [-NoList] [-on/-off] [machine_name]
-echo.
-echo -----------------Help-----------------------------------------------
-echo Help     : remotesvc_winrm.cmd [(with no args)(/?)(-h)(--help)]  
-echo.
-echo Examples : remotesvc_winrm.cmd -UseList -on C:\serverlist.txt
-echo            remotesvc_winrm.cmd -UseList -off C:\serverlist.txt
-echo            remotesvc_winrm.cmd -NoList -on MACHINE_NAME
-echo            remotesvc_winrm.cmd -NoList -off MACHINE_NAME
-echo            remotesvd_winrm.cmd --help
-echo.
-echo ###################################################################
+	echo.
+	echo ####HELP###########################################################
+	echo.
+	echo Program  : remotesvc_winrm.cmd
+	echo Needed   : Ensure PSService.exe is in $Path
+	echo            Ensure a listfile for machines exists
+	echo            Ensure all servers are reachable
+	echo Limits   : no check added so far covering the case where a
+	echo            server cannot be contacted
+	echo.
+	echo -----------------With List-----------------------------------------
+	echo Function : read the computerlist argument (example: C:\serverlist.txt)
+	echo            in a for loop process each server name (1 per line)
+	echo            and run the defined command on each server remotely
+	echo Usage
+	echo          : remotesvc_winrm.cmd [-UseList] [-on/-off] [serverlist.txt]
+	echo.
+	echo -----------------With Machine Name----------------------------------
+	echo Function : read the computername argument (example: MACHINE_NAME)
+	echo            and set WinRM service on and Automatic
+	echo            or set the WinRM service to off and Manual
+	echo Usage    : remotesvc_winrm.cmd [-NoList] [-on/-off] [machine_name]
+	echo.
+	echo -----------------Help-----------------------------------------------
+	echo Help     : remotesvc_winrm.cmd [(with no args)(/?)(-h)(--help)]  
+	echo.
+	echo Examples : remotesvc_winrm.cmd -UseList -on C:\serverlist.txt
+	echo            remotesvc_winrm.cmd -UseList -off C:\serverlist.txt
+	echo            remotesvc_winrm.cmd -NoList -on MACHINE_NAME
+	echo            remotesvc_winrm.cmd -NoList -off MACHINE_NAME
+	echo            remotesvd_winrm.cmd --help
+	echo.
+	echo ###################################################################
 
 :EOF
-endlocal
+	endlocal
